@@ -1,27 +1,56 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"os"
 )
 
-var path = "/home/andrimlna/Documents/Course/Ebook Course/Nopal Course Golang/A. Pemrograman Golang Dasar/41 File/temp/text.txt"
+var path = "/home/andrimlna/Documents/Course/Ebook Course/Nopal Course Golang/A. Pemrograman Golang Dasar/41 File/temp/test.json"
+
+type ListData struct {
+	ID           int    `json:"id"`
+	PropertyName string `json:"property_name"`
+	Url          string `json:"url"`
+}
+
+func readJson() []ListData {
+	var list_data []ListData
+	var respData []ListData
+
+	fileJson, err := os.Open(path)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	defer fileJson.Close()
+	byteValue, _ := ioutil.ReadAll(fileJson)
+	json.Unmarshal(byteValue, &list_data)
+	for i := 0; i < len(list_data); i++ {
+		lst := ListData{
+			ID:           list_data[i].ID,
+			PropertyName: list_data[i].PropertyName,
+			Url:          list_data[i].Url,
+		}
+
+		respData = append(respData, lst)
+	}
+	return respData
+}
 
 func isError(err error) bool {
 	if err != nil {
 		fmt.Println(err.Error())
 	}
-
 	return (err != nil)
 }
 
-// fungsi membuat file baru
-func createFile() {
-	// deteksi apakah file sudah ada atau belum
+func CreateFile() {
+	// cek lokasi file
 	_, err := os.Stat(path)
 
-	// jika belum ada maka akan membuat file baru
+	// create file
 	if os.IsNotExist(err) {
 		file, err := os.Create(path)
 		if isError(err) {
@@ -30,47 +59,38 @@ func createFile() {
 		defer file.Close()
 	}
 
-	fmt.Println("==> file berhasil dibuat di :", path)
+	fmt.Println("==> file successfully created", path)
 }
 
-// membuat fungsi untuk mengisi file text
 func writeFile() {
-	// membuka file dan menentuka level akses
-	file, err := os.OpenFile(path, os.O_RDWR, 0644)
+	// open file
+	file, err := os.OpenFile(path, os.O_RDWR, 0664)
 	if isError(err) {
 		return
 	}
 	defer file.Close()
 
-	// mengisi file
-	_, err = file.WriteString("Hallo Andri Maulana\n")
+	// isi file
+	_, err = file.WriteString("How to be a backend engineering\n")
 	if isError(err) {
 		return
 	}
-	_, err = file.WriteString("Selamat belajar python\n")
+	_, err = file.WriteString("The backend engineering to be hard to keep leaning\n")
 	if isError(err) {
 		return
 	}
-
-	// save file
+	// sync for save
 	err = file.Sync()
-	if isError(err) {
-		return
-	}
-
-	fmt.Println("==> file berhasil di isi")
+	fmt.Println("==>> file successfully synced", path)
 }
-
-// membaca isi file
 func readFile() {
-	// membuka file dan menentukan level akses
-	file, err := os.OpenFile(path, os.O_RDONLY, 0644)
+	// read file
+	file, err := os.OpenFile(path, os.O_RDONLY, 0664)
 	if isError(err) {
 		return
 	}
 	defer file.Close()
-
-	// membaca file
+	// read file
 	text := make([]byte, 1024)
 	for {
 		n, err := file.Read(text)
@@ -79,28 +99,32 @@ func readFile() {
 				break
 			}
 		}
-
 		if n == 0 {
 			break
 		}
 	}
-
-	fmt.Println("==> file berhasil dibaca :")
+	if isError(err) {
+		return
+	}
+	fmt.Println("file successfully read")
 	fmt.Println(string(text))
+
 }
 
-// menghapus file
 func deleteFile() {
 	err := os.Remove(path)
 	if isError(err) {
 		return
 	}
 
-	fmt.Println("==> file berhasil di hapus")
+	fmt.Println("===>> file successfully deleted")
 }
+
 func main() {
-	// createFile()
+	// CreateFile()
 	// writeFile()
 	// readFile()
-	deleteFile()
+	// deleteFile()
+
+	fmt.Println(readJson())
 }

@@ -3,12 +3,16 @@ package main
 import "fmt"
 
 func main() {
-	var original = 4
+	var number int = 4
 
-	changeNUmber(&original, 10)
-	fmt.Println(original)
+	fmt.Println("Number before (value) :", number)
+	fmt.Println("Number before (Address) :", &number)
+
+	Change(&number, 10)
+	fmt.Println("Number after (value) :", number)
+	fmt.Println("Number after (Address) :", &number)
 }
 
-func changeNUmber(number *int, value int)  {
-	*number = value
+func Change(original *int, number int) {
+	*original = number
 }
